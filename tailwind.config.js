@@ -48,6 +48,7 @@ module.exports = {
         cartBg: "#282a2c",
         cartItem: "#2e3033",
         cartTotal: "#343739",
+        cartNumBg: "#e80013",
       },
       screens: {
         sm: "640px",

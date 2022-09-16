@@ -3,6 +3,14 @@ import { motion } from "framer-motion";
 import {MdFastfood, MdCloudUpload, MdDelete, MdFoodBank, MdAttachMoney} from 'react-icons/md'
 import { categories } from "../utils/data";
 import Loader from "./Loader";
+import {
+  deleteObject,
+  getDownloadURL,
+  ref,
+  uploadBytesResumable,
+} from "firebase/storage";
+import { storage } from "../firebase.config";
+import { saveItem } from "../utils/firebaseFunctions";
 
 
 const CreateContainer = () => {
@@ -16,9 +24,107 @@ const CreateContainer = () => {
   const [msg, setMsg] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-const uploadImage =()=>{}
-const deleteImage =()=>{}
-const saveDetails =()=>{}
+  const uploadImage = (e) => {
+    setIsLoading(true);
+    const imageFile = e.target.files[0];
+    const storageRef = ref(storage, `Images/${Date.now()}-${imageFile.name}`);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      "state_changed",
+      (snapshot) => {
+        const uploadProgress =
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      },
+      (error) => {
+        console.log(error);
+        setFields(true);
+        setMsg("Error while uploading : Try AGain 🙇");
+        setAlertStatus("danger");
+        setTimeout(() => {
+          setFields(false);
+          setIsLoading(false);
+        }, 4000);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageAsset(downloadURL);
+          setIsLoading(false);
+          setFields(true);
+          setMsg("Image uploaded successfully 😊");
+          setAlertStatus("success");
+          setTimeout(() => {
+            setFields(false);
+          }, 4000);
+        });
+      }
+    );
+  };
+
+ const deleteImage = () => {
+    setIsLoading(true);
+    const deleteRef = ref(storage, imageAsset);
+    deleteObject(deleteRef).then(() => {
+      setImageAsset(null);
+      setIsLoading(false);
+      setFields(true);
+      setMsg("Image deleted successfully 😊");
+      setAlertStatus("success");
+      setTimeout(() => {
+        setFields(false);
+      }, 4000);
+    });
+  };
+
+
+const saveDetails =()=>{
+  setIsLoading(true)
+  try {
+    if(!title || !calories || !price || !category || !imageAsset){
+      setFields(true)
+      setMsg("Required fields can't be EMPTY")
+      setAlertStatus("danger")
+      setTimeout(()=>{
+        setFields(false)
+      },4000)
+    }else{
+    const data = {
+    id:Date.now(),
+    title:title,
+    imageURL:imageAsset,
+    categories:category,
+    calories:calories,
+    qty:1,
+    price:price
+    }
+    saveItem(data)
+    setIsLoading(false);
+    setFields(true);
+    setMsg("Data uploaded successfully 😊");
+    clearData()
+    setAlertStatus("success");
+    setTimeout(() => {
+    setFields(false);
+    }, 4000);
+    }
+  } catch (error) {
+    console.log(error);
+    setFields(true);
+    setMsg("Error while uploading : Try AGain 🙇");
+    setAlertStatus("danger");
+    setTimeout(() => {
+      setFields(false);
+      setIsLoading(false);
+    }, 4000);
+  }}
+
+  const clearData = () => {
+    setTitle("");
+    setCalories("");
+    setPrice("");
+    setCategory("Select Category");
+    setImageAsset(null);
+  }
   return (
     <div className='w-full min-h-screen h-auto flex items-center justify-center '>
       <div className='w-[90%] md:w-[75%] border border-gray-300 rounded-lg p-4 
@@ -71,10 +177,13 @@ const saveDetails =()=>{}
                 <div className="relative h-full">
                   <img src={imageAsset} alt="uploaded image" 
                   className="w-full h-full object-cover"/>
-                  <button type="button" className="absolute bottom-3 right-3 bg-red-500 rounded-full text-xl 
-                  cursor-pointer outline-none hover:shadow-md duration-100 transition-all ease-in-out"
-                  onclick={deleteImage}
-                  > <MdDelete className="text-white" />  </button>
+                    <button
+                      type="button"
+                      className="absolute bottom-3 right-3 p-3 rounded-full bg-red-500 text-xl cursor-pointer outline-none hover:shadow-md  duration-500 transition-all ease-in-out"
+                      onClick={deleteImage}
+                    >
+                      <MdDelete className="text-white" />
+                    </button>
                 </div>
                 </>}
             </>}
@@ -94,9 +203,12 @@ const saveDetails =()=>{}
             </div>
           </div>
           <div className="flex items-center w-full">
-          <button type="button" className="ml-0 md:ml-auto w-full md:w-auto border-none outline-none
-           bg-emerald-500 px-12 py-2 rounded-lg text-lg text-white font-semibold" onclick={saveDetails}>
-            SAVE
+          <button
+            type="button"
+            className="ml-0 md:ml-auto w-full md:w-auto border-none outline-none bg-emerald-500 px-12 py-2 rounded-lg text-lg text-white font-semibold"
+            onClick={saveDetails}
+          >
+            Save
           </button>
           </div>
       </div>

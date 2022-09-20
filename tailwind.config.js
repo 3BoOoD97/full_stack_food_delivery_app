@@ -53,6 +53,8 @@ module.exports = {
         cardOverlay: "rgba(256,256,256,0.4)",
         lighttextGray: "#9ca0ab",
         primary: "#f5f3f3",
+        card: "rgba(256,256,256,0.8)",
+
       },
       screens: {
         sm: "640px",

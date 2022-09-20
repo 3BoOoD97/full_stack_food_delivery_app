@@ -5,6 +5,7 @@ import { MdChevronLeft, MdChevronRight } from "react-icons/md";
 import RowContainer from './RowContainer';
 import { useStateValue } from "../context/StateProvider";
 import {useState} from 'react';
+import MenuContainer from './MenuContainer';
 
 const MainContainer = () => {
   const [{foodItems}, dispatch] = useStateValue();
@@ -22,8 +23,7 @@ const MainContainer = () => {
           </p>
           
           <div className='hidden md:flex items-center gap-3'>
-            <motion.div whileTap={{scale:0.75}} className='w-8 h-8 rounded-lg bg-orange-300 hover:bg-orange-500 cursor-pointer transition-all 
-            duration-100 ease-in-out hover:shadow-lg flex items-center justify-center'
+            <motion.div whileTap={{scale:0.75}} className='w-8 h-8 rounded-lg bg-orange-300 hover:bg-orange-500 cursor-pointer ease-in-out hover:shadow-lg flex items-center justify-center'
             onClick={()=> setScrollValue(-200)}>
               
               <MdChevronLeft className='text-white text-lg' />
@@ -39,6 +39,7 @@ const MainContainer = () => {
       scrollValue={scrollValue}
       flag={true} data={foodItems?.filter(n=>n.categories==='fruits')}/>
       </section>
+      <MenuContainer></MenuContainer>
       </div>
   )
 }

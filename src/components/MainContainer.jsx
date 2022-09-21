@@ -6,12 +6,13 @@ import RowContainer from './RowContainer';
 import { useStateValue } from "../context/StateProvider";
 import {useState} from 'react';
 import MenuContainer from './MenuContainer';
+import CartContainer from './CartContainer';
 
 const MainContainer = () => {
-  const [{foodItems}, dispatch] = useStateValue();
+  const [{foodItems, cartShow}, dispatch] = useStateValue();
  const [scrollValue, setScrollValue] = useState(0)
 
- useEffect(() => {}, [scrollValue])
+ useEffect(() => {}, [scrollValue, cartShow])
   
   return (
     <div className='w-full h-auto flex flex-col items-center justify-center'>
@@ -39,7 +40,11 @@ const MainContainer = () => {
       scrollValue={scrollValue}
       flag={true} data={foodItems?.filter(n=>n.categories==='fruits')}/>
       </section>
-      <MenuContainer></MenuContainer>
+      <MenuContainer />
+
+      {cartShow && (
+        <CartContainer />
+      )} 
       </div>
   )
 }
